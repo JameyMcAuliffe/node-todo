@@ -11,6 +11,7 @@ let app = express();
 /********** Middlewares **********/
 
 //returns as a function, allowing you to send json to server 
+//takes string body and turns into js object
 app.use(bodyParser.json());
 
 /********** Routes **********/
@@ -33,4 +34,6 @@ app.post('/todos', (req, res) => {
 app.listen(3000, () => {
 	console.log('Listening on port 3000');
 });
+
+module.exports = {app};
 
