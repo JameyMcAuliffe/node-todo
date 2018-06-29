@@ -18,6 +18,7 @@ app.use(bodyParser.json());
 
 /********** Routes **********/
 
+//Post new todo to db
 app.post('/todos', (req, res) => {
 	let todo = new Todo({
 		//body object comes from bodyParser middleware
@@ -31,6 +32,7 @@ app.post('/todos', (req, res) => {
 	});
 });
 
+//Get all todos from db
 app.get('/todos', (req, res) => {
 	Todo.find().then((todos) => {
 		res.send({todos});
@@ -39,6 +41,7 @@ app.get('/todos', (req, res) => {
 	});
 });
 
+//Get todo by ID from db
 app.get('/todos/:id', (req, res) => {
 	let id = req.params.id;
 
@@ -54,6 +57,24 @@ app.get('/todos/:id', (req, res) => {
 		res.send({todo});
 	}).catch((e) => {
 		res.status(400).send()
+	});
+});
+
+//Remove todo by ID from db
+app.delete('/todos/:id', (req, res) => {
+	let id = req.params.id;
+
+	if(!ObjectID.isValid(id)) {
+		return res.status(404).send();
+	}
+
+	Todo.findByIdAndRemove(id).then((todo) => {
+		if(!todo) {
+			return res.status(404).send();
+		}
+		res.status(200).send(todo);
+	}).catch((e) => {
+		res.status(400).send();
 	});
 });
 
