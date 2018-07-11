@@ -8,6 +8,7 @@ const _ = require('lodash');
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
+const {authenticate} = require('./middleware/authenticate');
 
 //store express application
 let app = express();
@@ -120,10 +121,18 @@ app.post('/users', (req, res) => {
 	user.save().then(() => {
 		return user.generateAuthToken();
 	}).then((token) => {
+		//res.header lets you set a header with key value
 		res.header('x-auth', token).send(user);
 	}).catch((e) => {
 		res.status(400).send(e);
 	});	
+});
+
+//private route taking x-auth returning user
+//also takes custom middleware authenticate function
+app.get('/users/me', authenticate, (req, res) => {
+	//req.user available from authenticate middleware
+	res.send(req.user);
 });
 
 

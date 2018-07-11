@@ -34,7 +34,7 @@ let UserSchema = new mongoose.Schema({
 	}]
 });
 
-UserSchema.methods.toJSON = function () {
+UserSchema.methods.toJSON = function() {
 	let user = this;
 	//takes a mongoose variable converting to an object
 	let userObject = user.toObject();
@@ -43,16 +43,39 @@ UserSchema.methods.toJSON = function () {
 };
 
 //an object that allows you to add on instance methods
-UserSchema.methods.generateAuthToken = function () {
+UserSchema.methods.generateAuthToken = function() {
+	//instance methods get called with the document as this binding
 	let user = this;
 	let access = 'auth';
-	let token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
+	let token = jwt.sign({_id: user._id, access}, 'abc123');
 
-	user.tokens = user.tokens.concat([{access, token}]);
+	//user.tokens = user.tokens.concat([{access, token}]);
+	user.tokens.push({access, token});
 
 	//return allows a promise to be chained on in server.js
 	return user.save().then(() => {
 		return token;
+	});
+};
+
+//statics creates a model method
+UserSchema.statics.findByToken = function(token) {
+	//model methods get called as the model with this binding
+	let User = this;
+	let decoded;
+
+	//need to run in a try/catch because jwt.verify returns an error if not a match
+	try {
+		decoded = jwt.verify(token, 'abc123')
+	} catch (e) {
+		return Promise.reject();
+	}
+
+	return User.findOne({
+		'_id': decoded._id,
+		//wrap in quotes for nested variables
+		'tokens.token': token,
+		'tokens.access': 'auth'
 	});
 };
 
