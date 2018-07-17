@@ -147,6 +147,16 @@ app.post('/users/login', (req, res) => {
 	});
 });
 
+app.delete('/users/me/token', authenticate, (req, res) => {
+	let token = req.token;
+
+	req.user.removeToken(token).then(() => {
+		res.status(200).send();
+	}, () => {
+		res.status(400).send();
+	});
+});
+
 
 app.listen(port, () => {
 	console.log(`Listening on port ${port}`);
