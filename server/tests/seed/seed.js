@@ -18,18 +18,24 @@ const users = [{
 }, {
 	_id: userTwoId,
 	email: 'jmc2@email.com',
-	password: 'password2'
+	password: 'password2',
+	tokens: [{
+		access: 'auth',
+		token: jwt.sign({_id: userTwoId, access: 'auth'}, 'abc123').toString()
+	}]
 }];
 
 //dummy todos
 const todos = [{
 	text: 'Numba 1',
-	_id: new ObjectID()
+	_id: new ObjectID(),
+	_creator: userOneId
 }, {
 	text: 'Numba 2',
 	_id: new ObjectID(),
 	completed: true,
-	completedAt: 2343234
+	completedAt: 2343234,
+	_creator: userTwoId
 }];
 
 //run some code before each test case
