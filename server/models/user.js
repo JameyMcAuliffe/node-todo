@@ -48,7 +48,7 @@ UserSchema.methods.generateAuthToken = function() {
 	//instance methods get called with the document as this binding
 	let user = this;
 	let access = 'auth';
-	let token = jwt.sign({_id: user._id, access}, 'abc123');
+	let token = jwt.sign({_id: user._id, access}, process.env.JWT_SECRET);
 
 	//user.tokens = user.tokens.concat([{access, token}]);
 	user.tokens.push({access, token});
@@ -79,7 +79,7 @@ UserSchema.statics.findByToken = function(token) {
 
 	//need to run in a try/catch because jwt.verify returns an error if not a match
 	try {
-		decoded = jwt.verify(token, 'abc123')
+		decoded = jwt.verify(token, process.env.JWT_SECRET)
 	} catch (e) {
 		return Promise.reject();
 	}
